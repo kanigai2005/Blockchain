@@ -1,0 +1,23 @@
+{
+  "chain": [
+    {
+      "index": 0,
+      "timestamp": 1775109361.3189006,
+      "transactions": [
+        {
+          "type": "GENESIS",
+          "message": "TrustChain Advanced Genesis"
+        }
+      ],
+      "nonce": 0,
+      "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "e20441ccd34be1c7e8f33d632a5e8c7deeed6dc688a26e185f98b2e367a0eec5"
+    }
+  ],
+  "nodes": [],
+  "metrics": {
+    "last_mine_time": 0.0,
+    "total_mines": 0,
+    "avg_mine_duration": 0.0
+  }
+}

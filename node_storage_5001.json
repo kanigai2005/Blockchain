@@ -1,0 +1,107 @@
+{
+  "chain": [
+    {
+      "index": 0,
+      "timestamp": 1775109343.0738537,
+      "transactions": [
+        {
+          "type": "GENESIS",
+          "message": "TrustChain Advanced Genesis"
+        }
+      ],
+      "nonce": 0,
+      "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "40c880dd638e23cbab131d944282eab570b299e685c84f5839fa6c8d8282c494"
+    },
+    {
+      "index": 1,
+      "timestamp": 1775114400.1303134,
+      "transactions": [
+        {
+          "type": "ADD_STOCK",
+          "item": "laptop",
+          "quantity": 10,
+          "added_by": "admin",
+          "note": "note",
+          "timestamp": 1775114360,
+          "signature": "a75f17aba44920aa72755b83f2cd194e278d8e1ae83e5a00d5a16de6226d96580a072f563a366e83673cb80150cfac760383ff6a4765c2754e2acfdccf622f0d",
+          "public_key": "f9fe63772debfba7b602ba7f24c6849a8ee1696dcf9c13d9914258137d558485"
+        },
+        {
+          "type": "MALICIOUS",
+          "item": "VOID_ITEM",
+          "quantity": 9999
+        }
+      ],
+      "nonce": 30789,
+      "previous_hash": "40c880dd638e23cbab131d944282eab570b299e685c84f5839fa6c8d8282c494",
+      "hash": "0000ef455f64e7d935a676014d8243948e53d0679da8a2a9c4ca4c84564343a8"
+    },
+    {
+      "index": 2,
+      "timestamp": 1775114709.8042717,
+      "transactions": [
+        {
+          "type": "PURCHASE",
+          "item": "laptop",
+          "quantity": 1,
+          "added_by": "admin",
+          "note": "note",
+          "timestamp": 1775114609,
+          "signature": "22b0ced02d0fb7914d0f43deca78740a015dec8796d10ee19c041ba3e74da16065716ad8ee519df75ef5865be551fb0df716ceb4af6ab30c7c769965630fd107",
+          "public_key": "f9fe63772debfba7b602ba7f24c6849a8ee1696dcf9c13d9914258137d558485"
+        },
+        {
+          "type": "ADD_STOCK",
+          "item": "Phone",
+          "quantity": 10,
+          "added_by": "admin",
+          "note": "note",
+          "timestamp": 1775114681,
+          "signature": "7c3d3b9e96c4dd677f8f1a7628ee0c4e217a9811af93fbfd4ad2e6f07c523436ee9aec633f8426e171c5d220447f489803084c683c2ddfa56db8fc6a3f814002",
+          "public_key": "f9fe63772debfba7b602ba7f24c6849a8ee1696dcf9c13d9914258137d558485"
+        }
+      ],
+      "nonce": 148917,
+      "previous_hash": "0000ef455f64e7d935a676014d8243948e53d0679da8a2a9c4ca4c84564343a8",
+      "hash": "00008ed6177a4d0738147876c0548b88692dc96f9635ab529aaf210981175713"
+    },
+    {
+      "index": 3,
+      "timestamp": 1775120060.0566144,
+      "transactions": [
+        {
+          "type": "ADD_STOCK",
+          "item": "egg",
+          "quantity": 10,
+          "added_by": "admin",
+          "note": "",
+          "timestamp": 1775119942,
+          "signature": "8557299b5021714540f54ca9e8fba314efc1eee8cdbae25756446f258a2fdfe1f93b843150c72190c9129263ff67f8f01c8cb69f19f67b7a24bd050e37ab0d08",
+          "public_key": "fc283afc6a3f6347594b6f45cbde0dd019202a48da839ee4c68d072575f9dcff"
+        },
+        {
+          "type": "ADD_STOCK",
+          "item": "egg",
+          "quantity": 10,
+          "added_by": "admin",
+          "note": "",
+          "timestamp": 1775119954,
+          "signature": "77cd00f287ba43dc24a2c93dfccf42adc0d5f4dc6fe071f832d6be4d9df79c02112684a7b8e14f2394dd7325800b9ffb92d2d8bb17882bc548fd6c278ab4b006",
+          "public_key": "fc283afc6a3f6347594b6f45cbde0dd019202a48da839ee4c68d072575f9dcff"
+        }
+      ],
+      "nonce": 30892,
+      "previous_hash": "00008ed6177a4d0738147876c0548b88692dc96f9635ab529aaf210981175713",
+      "hash": "00001a15dc227af1926cf0bec9d0fe8a9a35829941516b46a4a276c90841e50f"
+    }
+  ],
+  "nodes": [
+    "http://localhost:5002"
+  ],
+  "metrics": {
+    "last_mine_time": 0.47093749046325684,
+    "total_mines": 3,
+    "avg_mine_duration": 1.0278386274973552
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "admin": {
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "admin",
+    "display_name": "Super Admin",
+    "avatar": "\ud83d\udee1\ufe0f",
+    "public_key": "fc283afc6a3f6347594b6f45cbde0dd019202a48da839ee4c68d072575f9dcff",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIFtAZuSSrFZmhfgsalNqaB+I3TkaEz7okfCdTKvo/qR/\n-----END PRIVATE KEY-----\n"
+  },
+  "admin2": {
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "admin",
+    "display_name": "Node Admin (Regional)",
+    "avatar": "\ud83d\udc77",
+    "public_key": "08ed365dccd1095f9ad0296e0eb4495c218e50d553a15c33be9b562423928b54",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKXgl0aI6yOWgzH6eFie63t1E70MNSNtmHZjXbTEAJPW\n-----END PRIVATE KEY-----\n"
+  },
+  "admin3": {
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "admin",
+    "display_name": "Audit Admin",
+    "avatar": "\ud83d\udd0d",
+    "public_key": "fa218c247b2812b0daf944d1f0ec3c7b51ae6c37e3ac80a1c8b4aa0e4014f07b",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIBEmPYHEQ8R8TMiJ7ie85FP1LTa7+B7KgdGPJlxjK15I\n-----END PRIVATE KEY-----\n"
+  },
+  "sales": {
+    "password_hash": "6bc0a63cb29c92306020c0a6bbc358cc4628db277dc06e253535e126517ad637",
+    "role": "sales",
+    "display_name": "Sales User",
+    "avatar": "\ud83d\uded2",
+    "public_key": "5c970656b82e0513dee28670003b062fe57fc273b91a902de9fddb0ff24df73d",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEINy5BlKw/Imk9jSN4m4RsZDDxE8g+xxWWvHmX6MpIWOh\n-----END PRIVATE KEY-----\n"
+  }
+}
