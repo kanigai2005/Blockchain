@@ -125,6 +125,14 @@ def sign_transaction(private_key_pem, tx_data):
 # ─── API Helpers ─────────────────────────────────────────────────────────────
 
 def get_node_url():
+    # 1. Initialize session state from Query Params if first time
+    qp = st.query_params
+    if "node" in qp and "node_initialized" not in st.session_state:
+        port = qp["node"]
+        st.session_state["node_url"] = f"http://localhost:{port}"
+        st.session_state["node_initialized"] = True
+        
+    # 2. Return current session state (which is updated by the Dropdown)
     return st.session_state.get("node_url", "http://localhost:5001")
 
 def api(method: str, path: str, **kwargs):
@@ -144,19 +152,102 @@ with st.sidebar:
     st.markdown('<p style="color:#64748b">Advanced Inventory Ledger</p>', unsafe_allow_html=True)
     st.divider()
 
-    st.session_state["node_url"] = st.text_input("Node URL", value=get_node_url())
-    if st.button("🔄 Refresh Data", use_container_width=True): st.rerun()
+    # 1. Improved Node Switcher (Fixed with persistent key)
+    st.subheader("🌐 Node Switcher")
+    
+    known_nodes = ["http://localhost:5001", "http://localhost:5002", "http://localhost:5003", "http://localhost:5004"]
+    
+    # Calculate initial index based on current URL
+    current_u = get_node_url()
+    try: idx = known_nodes.index(current_u)
+    except: idx = 0
 
-    health, _ = api("GET", "/health")
+    # Use a key to ensure Streamlit remembers the selection correctly
+    current_node = st.selectbox(
+        "Focus Node", 
+        known_nodes, 
+        index=idx, 
+        key="node_selector_dropdown"
+    )
+    st.session_state["node_url"] = current_node
+    
+    # Manual override if needed
+    with st.expander("Custom Node URL"):
+        custom_node = st.text_input("Enter URL", value=current_node)
+        if st.button("Connect Custom"):
+            st.session_state["node_url"] = custom_node
+            st.rerun()
+
+    if st.button("🔄 Refresh Data", use_container_width=True): 
+        st.rerun()
+
+    st.divider()
+
+    # 2. Network-Wide Health Monitor (Dynamic)
+    st.subheader("🛰 Network Status")
+    
+    # Base nodes + any custom node the user added
+    monitor_list = ["http://localhost:5001", "http://localhost:5002", "http://localhost:5003", "http://localhost:5004"]
+    if st.session_state.get("node_url") not in monitor_list:
+        monitor_list.append(st.session_state["node_url"])
+
+    online_nodes = []
+    for node in monitor_list:
+        if not node: continue
+        try:
+            with httpx.Client(timeout=0.5) as client:
+                r = client.get(f"{node}/health")
+                if r.status_code == 200:
+                    h = r.json()
+                    status_icon = "🟢" if h["status"] == "HEALTHY" else "🔴"
+                    st.markdown(f"{status_icon} **{node.split(':')[-1]}**: H-{h['chain_height']}")
+                    online_nodes.append(node)
+                else: 
+                    # Only show if not focusing on it or if it's a primary node
+                    if node.split(':')[-1] in ["5001","5002","5003","5004"] or node == st.session_state["node_url"]:
+                        st.markdown(f"⚪ **{node.split(':')[-1]}**: Offline")
+        except:
+            if node.split(':')[-1] in ["5001","5002","5003","5004"] or node == st.session_state["node_url"]:
+                st.markdown(f"⚪ **{node.split(':')[-1]}**: Offline")
+
+    # NEW: Automated Inter-Node Linker (The "Easy Button")
+    if len(online_nodes) > 1:
+        if st.button("🔗 Link All Nodes", help="Tells all online nodes about each other for consensus."):
+            with st.spinner("Broadcasting topology..."):
+                for source in online_nodes:
+                    peers = [n for n in online_nodes if n != source]
+                    try:
+                        httpx.post(f"{source}/nodes/register", json={"nodes": peers}, timeout=2)
+                    except: pass
+                st.success("Network Linked!")
+                st.rerun()
+
+    st.divider()
+    
+    # 3. Active Node Health (Detailed & Offline Feedback)
+    health, err = api("GET", "/health")
     if health:
         status_css = "badge-healthy" if health["status"] == "HEALTHY" else "badge-compromised"
         st.markdown(f'<div style="text-align:center"><span class="{status_css}">{health["status"]}</span></div>', unsafe_allow_html=True)
-        st.markdown(f"**Height:** {health['chain_height']} | **Node:** {health['node']}")
+        st.markdown(f"**Focused Node:** {health['node']}")
         
-        with st.expander("Node Metrics"):
-            m = health.get("metrics", {})
-            st.write(f"Avg Mine: {m.get('avg_mine_duration', 0):.2f}s")
-            st.write(f"Total Mines: {m.get('total_mines', 0)}")
+        # Self-Healing Status Indicator
+        if health["status"] == "COMPROMISED":
+            st.warning("⚠️ Node corrupted. Waiting for network consensus to heal...")
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("⚡ Heal", use_container_width=True):
+                    api("GET", "/nodes/resolve")
+                    st.rerun()
+            with c2:
+                if st.button("🗑️ Reset", help="Hard delete and resync", use_container_width=True):
+                    httpx.post(f"{get_node_url()}/nodes/receive_block", json={"chain": []}, timeout=2)
+                    st.rerun()
+    else:
+        # Show specific feedback for Offline nodes
+        st.markdown('<div style="text-align:center"><span style="color:#64748b; background:rgba(100,116,139,0.1); padding:4px 12px; border-radius:999px; font-weight:600;">OFFLINE</span></div>', unsafe_allow_html=True)
+        st.markdown(f"**Focused Node:** {get_node_url().split(':')[-1]}")
+        st.info(f"💡 Node 5004 is defined but not running. Open a terminal and run `python api.py 5004` to start it.")
     
     if st.session_state.get("authenticated"):
         st.divider()
@@ -187,6 +278,15 @@ if not st.session_state.get("authenticated"):
                         st.session_state["user_info"] = users[username]
                         st.rerun()
                 st.error("Invalid credentials")
+        
+        with st.expander("🔑 Demo Credentials"):
+            st.markdown("""
+            | Role | Username | Password |
+            | :--- | :--- | :--- |
+            | **Admin** | `admin` | `admin123` |
+            | **Admin 2** | `admin2` | `admin123` |
+            | **Sales** | `sales` | `sales123` |
+            """)
     st.stop()
 
 # ─── Main Interface ──────────────────────────────────────────────────────────

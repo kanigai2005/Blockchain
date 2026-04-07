@@ -362,33 +362,68 @@ class Blockchain:
     def replace_chain(self, new_chain_data: List[dict]) -> bool:
         new_chain = [Block.from_dict(b) for b in new_chain_data]
         
-        # We only accept longer chains, UNLESS we are currently corrupted (locked), 
+        # 1. Height check: We only accept longer chains, UNLESS we are currently corrupted (locked), 
         # in which case we accept a valid chain of equal length to heal ourselves.
         if len(new_chain) < len(self.chain):
             return False
         if len(new_chain) == len(self.chain) and not self.locked:
             return False
             
+        # 2. Validity check: Ensures hashes and Proof of Work are correct
         if not self._is_chain_valid(new_chain):
             return False
             
+        # 3. Success: Adopt the new chain
         self.chain = new_chain
         self.locked = False  # <--- Healing Complete
+        
+        # 4. Cleanup: Remove transactions from pending pool if they are already in the new chain
+        new_tx_signatures = set()
+        for block in self.chain:
+            for tx in block.transactions:
+                if "signature" in tx:
+                    new_tx_signatures.add(tx["signature"])
+        
+        self.pending_transactions = [
+            tx for tx in self.pending_transactions 
+            if tx.get("signature") not in new_tx_signatures
+        ]
+        
         self._save_chain()
         return True
 
-    @staticmethod
-    def _is_chain_valid(chain: List[Block]) -> bool:
+    def _is_chain_valid(self, chain: List[Block]) -> bool:
+        # Check if genesis block matches
+        if len(chain) == 0:
+            return False
+            
+        genesis = chain[0]
+        our_genesis = self.chain[0]
+        
+        if genesis.hash != our_genesis.hash:
+            return False
+
         for i in range(1, len(chain)):
             current = chain[i]
             previous = chain[i - 1]
+            
+            # Check index continuity
+            if current.index != i:
+                return False
+                
+            # Check hash linkage
             if current.previous_hash != previous.hash:
                 return False
-            if compute_hash(current.to_dict_without_hash()) != current.hash:
+                
+            # Re-verify the block's own hash integrity
+            recalculated_hash = compute_hash(current.to_dict_without_hash())
+            if current.hash != recalculated_hash:
                 return False
-            # Check PoW
+                
+            # Check Proof of Work (Consensus Rule)
             if current.hash[:DIFFICULTY] != "0" * DIFFICULTY:
                 return False
+                
         return True
 
     def chain_as_dicts(self) -> List[dict]:

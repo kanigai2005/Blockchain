@@ -35,6 +35,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---------------------------------------------------------------------------
+# Background Consensus Worker
+# ---------------------------------------------------------------------------
+
+async def background_consensus():
+    """Periodically check with peers to sync the longest valid chain."""
+    while True:
+        try:
+            # Only run if there are peers to talk to
+            if bc.nodes:
+                async with httpx.AsyncClient(timeout=5) as client:
+                    for node in list(bc.nodes):
+                        try:
+                            # Use resolve endpoint's logic
+                            resp = await client.get(f"{node}/chain")
+                            if resp.status_code == 200:
+                                data = resp.json()
+                                # replace_chain handles validation and longest chain rule
+                                if bc.replace_chain(data["chain"]):
+                                    # If heal or sync happened, we could add a log here
+                                    pass
+                        except Exception:
+                            continue
+        except Exception:
+            pass
+        await asyncio.sleep(30) # Check every 30 seconds
+
+@app.on_event("startup")
+async def startup_event():
+    # Start the consensus worker in the background
+    asyncio.create_task(background_consensus())
+
 
 # ---------------------------------------------------------------------------
 # Pydantic models
